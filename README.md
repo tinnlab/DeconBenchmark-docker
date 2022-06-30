@@ -15,7 +15,7 @@ docker build -t ${PREFIX,,}/base:${TAG,,} .
 
 # build method image
 cd ../${METHOD}
-docker build --build-arg BASE_IMAGE=${PREFIX,,}/base:${TAG,,} -t ${PREFIX}/${METHOD,,}:latest .
+docker build --build-arg BASE_IMAGE=${PREFIX,,}/base:${TAG,,} -t ${PREFIX,,}/${METHOD,,}:latest .
 
 # print newly built images
 docker image ls | grep ${PREFIX,,} 
