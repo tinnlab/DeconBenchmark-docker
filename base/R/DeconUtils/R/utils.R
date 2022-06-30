@@ -8,11 +8,16 @@
 #’
 #’ @import rhdf5
 #’ @export
-getArgs <- function(params, path = "/args.h5") {
+getArgs <- function(params) {
     if (Sys.getenv("PARAMS_OUTPUT_PATH") != ""){
         paramOutputPath <- Sys.getenv("PARAMS_OUTPUT_PATH")
         write.csv(data.frame(params = params), paramOutputPath, row.names = F)
         quit(save = "no", status = 999)
+    }
+
+    path <- Sys.getenv("INPUT_PATH")
+    if (path == ""){
+        stop("Environment variable INPUT_PATH is not set")
     }
 
     h5f <- H5Fopen(path)
@@ -61,6 +66,9 @@ getArgs <- function(params, path = "/args.h5") {
 #’ @export
 writeH5 <- function(S, P, method="Unknown") {
     h5file <- Sys.getenv("OUTPUT_PATH")
+    if (h5file == ""){
+        stop("Environment variable OUTPUT_PATH is not set")
+    }
     message(method, " Writing results to ", h5file)
 
     unlink(h5file)
