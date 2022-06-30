@@ -3,11 +3,16 @@ import pandas as pd
 import numpy as np
 import os
 
-def getArgs(params, path="/args.h5"):
+def getArgs(params):
     if os.getenv("PARAMS_OUTPUT_PATH") is not None:
         paramOutputPath = os.getenv("PARAMS_OUTPUT_PATH")
         pd.DataFrame({'params': params}).to_csv(paramOutputPath, index=False)
         quit(code=999)
+
+    path = os.getenv("INPUT_PATH")
+    if path is None:
+        print("Environment variable INPUT_PATH is not set")
+        quit(code=1)
 
     f = h5py.File(path, 'r')
     dAll = dict()
@@ -45,6 +50,9 @@ def getArgs(params, path="/args.h5"):
 
 def writeH5(S, P, method):
     h5file = os.getenv("OUTPUT_PATH")
+    if h5file is None:
+        print("Environment variable OUTPUT_PATH is not set")
+        quit(code=1)
 
     print(method + " Writing results to " + h5file)
 
