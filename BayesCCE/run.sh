@@ -1,5 +1,5 @@
 #!/bin/sh
-
+set -e
 LIC_FILE=/licenses/license.lic
 if test -f "$LIC_FILE"; then
     export MLM_LICENSE_FILE=/licenses/license.lic
