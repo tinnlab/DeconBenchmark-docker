@@ -1,0 +1,10 @@
+Package: DeconUtils
+Type: Package
+Title: Deconvolution utilities
+Version: 1.0
+Date: 2022-06-06
+Author: Phi Hung Nguyen
+Imports: rhdf5
+Maintainer: Phi Hung Nguyen <hungnp@nevada.unr.edu>
+Description: Deconvolution utilities
+License: MIT

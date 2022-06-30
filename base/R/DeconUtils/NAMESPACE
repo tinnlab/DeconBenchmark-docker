@@ -1,0 +1,3 @@
+export("getArgs")
+export("writeH5")
+import("rhdf5")
