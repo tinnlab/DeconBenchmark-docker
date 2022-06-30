@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 tmp_dir=$(mktemp -d -t ci-XXXXXXXXXX)
 cd "$tmp_dir"
