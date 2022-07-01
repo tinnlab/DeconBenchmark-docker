@@ -12,10 +12,12 @@ RUN apt-get update &&  \
     r-bioc-summarizedexperiment \
     r-bioc-singlecellexperiment \
     r-bioc-scater \
-    r-bioc-scran && \
+    r-bioc-scran \
+    r-bioc-rhtslib && \
     apt-get clean
 
-RUN R -e 'install.packages("Rmisc"); BiocManager::install("methylKit", update=F)'
+RUN R -e 'install.packages("Rmisc")'
+RUN R -e 'BiocManager::install("methylKit", update=F)'
 RUN R -e 'devtools::install_github("rosedu1/deconvSeq", dependencies=F)'
 
 COPY run.R /code/
