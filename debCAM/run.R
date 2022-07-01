@@ -10,7 +10,7 @@ bulk <- args$bulk
 K <- args$nCellTypes
 
 rCAM <- CAM(bulk, K = K, dim.rdc = min(max(K + 5, 10), ncol(bulk)),
-            thres.low = 0.1, thres.high = 0.95)
+            thres.low = 0.3, thres.high = 0.95)
 
 P <- Amat(rCAM, K)
 S <- Smat(rCAM, K)

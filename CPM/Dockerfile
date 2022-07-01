@@ -7,6 +7,7 @@ RUN apt-get update && \
     r-cran-rtsne \
     r-cran-fields \
     r-cran-raster \
+    r-cran-irlba \
     r-bioc-limma && \
     apt-get clean
 
