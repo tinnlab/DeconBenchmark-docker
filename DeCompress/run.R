@@ -12,12 +12,13 @@ nCellTypes <- ncol(args$cellTypeExpr)
 
 set.seed(args$seed)
 
-reference_props <- apply(matrix(abs(rnorm(100*nCellTypes)),ncol=nCellTypes), 1, function(x) x/sum(x))
+reference_props <- apply(matrix(abs(rnorm(100*nCellTypes)),ncol=nCellTypes),
+                         1, function(x) x/sum(x))
 reference <- args$cellTypeExpr %*% reference_props
 
 compSpec <- findInformSet(yref = reference,
                           method = 'variance',
-                          n_genes = 1000,
+                          n_genes = 500,
                           n.types = nCellTypes)
 
 csModel <- trainCS(yref = reference[args$sigGenes, ],
@@ -41,6 +42,6 @@ csModel <- bestDeconvolution(yref = dcexp,
 P <- csModel$prop
 S <- csModel$sig
 
-colnames(P) <- colnames(S) <- colnames(args$cellTypeExpr)
+colnames(P) <- colnames(S) <- paste0('CT', seq_len(ncol(P)))
 
 DeconUtils::writeH5(S, P, "DeCompress")
