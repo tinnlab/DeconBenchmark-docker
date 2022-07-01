@@ -21,7 +21,7 @@ EOF
 
 python3 /code/create_h5ad.py -anno singleCellLabels.txt -exp singleCellExpr.txt -outdir ./
 #daism Generic_simulation -platform S -aug ./purified.h5ad -N 16000 -testexp ./bulk.txt -outdir ./
-daism Generic_simulation -platform S -aug ./purified.h5ad -N 4800 -testexp ./bulk.txt -outdir ./ #for more reasonable running time, need to be divided by 64
+daism Generic_simulation -platform S -aug ./purified.h5ad -N 1600 -testexp ./bulk.txt -outdir ./ #for more reasonable running time, need to be divided by 64
 daism training -trainexp ./output/Generic_mixsam.txt -trainfra ./output/Generic_mixfra.txt -outdir ./
 daism prediction -testexp ./bulk.txt -model ./output/DAISM_model.pkl -celltype ./output/DAISM_model_celltypes.txt -feature ./output/DAISM_model_feature.txt -outdir ./
 
