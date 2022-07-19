@@ -1,0 +1,42 @@
+name: Build docker images
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Check file changes
+      - run: git diff --name-only HEAD^ HEAD | grep --perl-regexp '^[^\/]+' --only-matching > changes.txt
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Build docker images
+      - run: |
+          set -e
+          while IFS= read -r METHOD
+          do
+            if [[ $METHOD != "data" ]]; then
+              echo "Building $METHOD"
+              
+              docker build -t deconvolution/${METHOD,,}:latest $METHOD/Dockerfile
+          
+              echo "Testing $METHOD"
+              docker run --rm -v ../data/Bone_Marrow.h5:/input.h5 -v $PWD:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 ${PREFIX,,}/${METHOD,,}:$TAG
+          
+              if [ -f "$METHOD-results.h5" ]; then
+                echo "Found $METHOD-results.h5"
+              else
+                echo "$METHOD-results.h5 does not exist."
+                exit 1
+              fi
+              
+              echo "Done building $METHOD"
+            else
+              echo "This modified file is under the 'data' folder."
+            fi
+          done < changes.txt
