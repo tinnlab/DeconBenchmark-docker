@@ -10,4 +10,4 @@ RUN R -e "install.packages('https://github.com/zhandong/DSA/blob/master/Package/
 
 COPY run.R /code/
 
-CMD ["R", "--no-restore", "--no-save", "--quiet", "--slave", "--file=/code/run.R" ]
+CMD ["R", "--no-restore", "--no-save", "--quiet", "--slave", "--file=/code/run.R"]
