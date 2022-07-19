@@ -27,7 +27,7 @@ jobs:
               
               docker build --build-arg BASE_IMAGE=deconvolution/base:latest -t deconvolution/${METHOD,,}:latest $METHOD
           
-              if [[ $METHOD != "base"]]; then
+              if [[ "$METHOD" != "base" ]]; then
                 echo "Testing $METHOD"
                 docker run --rm -v ./data/Bone_Marrow.h5:/input.h5 -v ./:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 ${PREFIX,,}/${METHOD,,}:$TAG
             
@@ -38,6 +38,11 @@ jobs:
                   exit 1
                 fi
               fi
-              echo "Done building $METHOD"
+              
+              echo "Authenticating docker hub"
+              docker login -u $DOCKER_USER -p {{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+          
+              echo "Pushing $METHOD to docker hub"
+              docker push deconvolution/${METHOD,,}:latest
             fi
           done < changes.txt
