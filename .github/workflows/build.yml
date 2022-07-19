@@ -2,9 +2,8 @@ name: Build docker images
 
 on:
   push:
-    branches:
-      - /refs/heads/*
-      - !master
+    branches-ignore:
+      - master
 
 jobs:
   build:
@@ -35,9 +34,12 @@ jobs:
             if [ -f "$METHOD/Dockerfile" ]; then
               echo "Building $METHOD"
               
-              docker buildx build --build-arg BASE_IMAGE=deconvolution/base:latest -t deconvolution/${METHOD,,}:latest \
+              docker buildx build \
+                     --build-arg BASE_IMAGE=deconvolution/base:latest \
+                     --tag deconvolution/${METHOD,,}:latest \
                      --cache-from=type=registry,ref=deconvolution/${METHOD,,}:buildcache \
-                     --cache-to=type=registry,ref=deconvolution/${METHOD,,}:buildcache,mode=max $METHOD
+                     --cache-to=type=registry,ref=deconvolution/${METHOD,,}:buildcache,mode=max \
+                     --output=type=docker $METHOD
           
               if [[ "$METHOD" != "base" ]]; then
                 echo "Testing $METHOD"
