@@ -38,7 +38,8 @@ jobs:
                      --build-arg BASE_IMAGE=deconvolution/base:latest \
                      --tag deconvolution/${METHOD,,}:latest \
                      --cache-from=type=registry,ref=deconvolution/${METHOD,,}:buildcache \
-                     --cache-to=type=registry,ref=deconvolution/${METHOD,,}:buildcache,mode=max $METHOD
+                     --cache-to=type=registry,ref=deconvolution/${METHOD,,}:buildcache,mode=max \
+                     --output=type=docker $METHOD
           
               if [[ "$METHOD" != "base" ]]; then
                 echo "Testing $METHOD"
