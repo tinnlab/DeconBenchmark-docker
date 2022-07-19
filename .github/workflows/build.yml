@@ -25,18 +25,19 @@ jobs:
             if [ -f "$METHOD/Dockerfile" ]; then
               echo "Building $METHOD"
               
-              docker build -t deconvolution/${METHOD,,}:latest $METHOD
+              docker build --build-arg BASE_IMAGE=deconvolution/base:latest -t deconvolution/${METHOD,,}:latest $METHOD
           
-              echo "Testing $METHOD"
-              docker run --rm -v ../data/Bone_Marrow.h5:/input.h5 -v $PWD:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 ${PREFIX,,}/${METHOD,,}:$TAG
-          
-              if [ -f "$METHOD-results.h5" ]; then
-                echo "Found $METHOD-results.h5"
-              else
-                echo "$METHOD-results.h5 does not exist."
-                exit 1
+              if [[ $METHOD != "base"]]; then
+                echo "Testing $METHOD"
+                docker run --rm -v ./data/Bone_Marrow.h5:/input.h5 -v ./:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 ${PREFIX,,}/${METHOD,,}:$TAG
+            
+                if [ -f "$METHOD-results.h5" ]; then
+                  echo "Found $METHOD-results.h5"
+                else
+                  echo "$METHOD-results.h5 does not exist."
+                  exit 1
+                fi
               fi
-              
               echo "Done building $METHOD"
             fi
           done < changes.txt
