@@ -43,7 +43,7 @@ jobs:
           
               if [[ "$METHOD" != "base" ]]; then
                 echo "Testing $METHOD"
-                docker run --rm -v ./data/Bone_Marrow.h5:/input.h5 -v ./:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 deconvolution/${METHOD,,}:latest
+                docker run --rm -v ./data/bone-marrow.h5:/input.h5 -v ./:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 deconvolution/${METHOD,,}:latest
             
                 if [ -f "$METHOD-results.h5" ]; then
                   echo "Found $METHOD-results.h5"
