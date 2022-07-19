@@ -10,13 +10,13 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Check file changes
-      - run: git diff --name-only HEAD^ HEAD | grep --perl-regexp '^[^\/]+' --only-matching > changes.txt
+        run: git diff --name-only HEAD^ HEAD | grep --perl-regexp '^[^\/]+' --only-matching > changes.txt
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
 
       - name: Build docker images
-      - run: |
+        run: |
           set -e
           while IFS= read -r METHOD
           do
