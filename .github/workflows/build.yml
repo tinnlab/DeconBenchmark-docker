@@ -25,7 +25,7 @@ jobs:
             if [ -f "$METHOD/Dockerfile" ]; then
               echo "Building $METHOD"
               
-              docker build -t deconvolution/${METHOD,,}:latest $METHOD/Dockerfile
+              docker build -t deconvolution/${METHOD,,}:latest $METHOD
           
               echo "Testing $METHOD"
               docker run --rm -v ../data/Bone_Marrow.h5:/input.h5 -v $PWD:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 ${PREFIX,,}/${METHOD,,}:$TAG

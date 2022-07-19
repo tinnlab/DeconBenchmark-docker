@@ -34,4 +34,4 @@ RUN pip3 install --no-cache-dir /code/Python/
 COPY R /code/R
 RUN R -e "install.packages('/code/R/DeconUtils/', type='source', repos=NULL)"
 
-CMD ["echo", "Welcome to DeconBenchmark! "]
+CMD ["echo", "Welcome to DeconBenchmark!"]
