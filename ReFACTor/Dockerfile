@@ -3,4 +3,4 @@ FROM $BASE_IMAGE
 
 COPY *.R /code/
 
-CMD ["R", "--no-restore", "--no-save", "--quiet", "--slave", "--file=/code/run.R"]
+CMD ["R", "--no-restore", "--no-save", "--quiet", "--slave", "--file=/code/run.R" ]
