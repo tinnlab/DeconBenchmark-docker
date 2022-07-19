@@ -22,7 +22,7 @@ jobs:
           set -e
           while IFS= read -r METHOD
           do
-            if [[ $METHOD != "data" ]]; then
+            if [ -f "$METHOD/Dockerfile" ]; then
               echo "Building $METHOD"
               
               docker build -t deconvolution/${METHOD,,}:latest $METHOD/Dockerfile
@@ -38,7 +38,5 @@ jobs:
               fi
               
               echo "Done building $METHOD"
-            else
-              echo "This modified file is under the 'data' folder."
             fi
           done < changes.txt
