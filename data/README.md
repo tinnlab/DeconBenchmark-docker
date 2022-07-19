@@ -1,6 +1,6 @@
 Data used for testing new Docker images.
 
-The `Bone_Marrow.h5` file is written by `DeconBenchmark::.writeArgs` using data from `Bone_Marrow.rds` file and has the following structure:
+The `bone-marrow.h5` file is written by `DeconBenchmark::.writeArgs` using data from `bone-marrow.rds` file and has the following structure:
 
 ```
                  group                           name       otype  dclass         dim
