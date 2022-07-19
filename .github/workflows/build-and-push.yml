@@ -3,8 +3,7 @@ name: Build docker images
 on:
   push:
     branches:
-      - /refs/heads/*
-      - !master
+    - master
 
 jobs:
   build:
@@ -34,15 +33,17 @@ jobs:
           do
             if [ -f "$METHOD/Dockerfile" ]; then
               echo "Building $METHOD"
-              
-              docker buildx build --build-arg BASE_IMAGE=deconvolution/base:latest -t deconvolution/${METHOD,,}:latest \
+          
+              docker buildx build \
+                     --build-arg BASE_IMAGE=deconvolution/base:latest \
+                     --tag deconvolution/${METHOD,,}:latest \
                      --cache-from=type=registry,ref=deconvolution/${METHOD,,}:buildcache \
                      --cache-to=type=registry,ref=deconvolution/${METHOD,,}:buildcache,mode=max $METHOD
           
               if [[ "$METHOD" != "base" ]]; then
                 echo "Testing $METHOD"
                 docker run --rm -v ./data/Bone_Marrow.h5:/input.h5 -v ./:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 ${PREFIX,,}/${METHOD,,}:$TAG
-            
+          
                 if [ -f "$METHOD-results.h5" ]; then
                   echo "Found $METHOD-results.h5"
                 else
@@ -51,7 +52,7 @@ jobs:
                 fi
               fi
           
-              # echo "Pushing $METHOD to docker hub"
-              # docker push deconvolution/${METHOD,,}:latest
+              echo "Pushing $METHOD to docker hub"
+              docker push deconvolution/${METHOD,,}:latest
             fi
           done < changes.txt
