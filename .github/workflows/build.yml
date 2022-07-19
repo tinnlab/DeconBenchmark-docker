@@ -1,9 +1,6 @@
 name: Build docker images
 
-on:
-  push:
-    branches-ignore:
-      - master
+on: [push]
 
 jobs:
   build:
@@ -26,6 +23,9 @@ jobs:
           username: deconvolution
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
+      - name: Set up Singularity
+        uses: eWaterCycle/setup-singularity@v7
+
       - name: Build docker images
         run: |
           set -e
@@ -42,18 +42,30 @@ jobs:
                      --output=type=docker $METHOD
           
               if [[ "$METHOD" != "base" ]]; then
-                echo "Testing $METHOD"
+                echo "Testing $METHOD using docker run"
                 docker run --rm -v `pwd`/data/bone-marrow.h5:/input.h5 -v `pwd`:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 deconvolution/${METHOD,,}:latest
             
                 if [ -f "$METHOD-results.h5" ]; then
-                  echo "Found $METHOD-results.h5"
+                  echo "Found $METHOD-results.h5 for docker run"
+                  
+                  echo "Testing $METHOD using singularity run"
+                  singularity run --env INPUT_PATH=`pwd`/data/bone-marrow.h5 --env OUTPUT_PATH=`pwd`/$METHOD-results.h5 docker-daemon:deconvolution/${METHOD,,}:latest  
+                  
+                  if [ -f "$METHOD-results.h5" ]; then
+                    echo "Found $METHOD-results.h5 for singularity run"        
+                  else
+                    echo "$METHOD-results.h5 does not exist using singularity run."
+                    exit 1
+                  fi
                 else
-                  echo "$METHOD-results.h5 does not exist."
+                  echo "$METHOD-results.h5 does not exist using docker run."
                   exit 1
                 fi
               fi
           
-              # echo "Pushing $METHOD to docker hub"
-              # docker push deconvolution/${METHOD,,}:latest
+              if [[ ${{github.ref}} == "master" ]]; then
+                echo "Pushing $METHOD to docker hub"
+                docker push deconvolution/${METHOD,,}:latest
+              fi
             fi
           done < changes.txt
