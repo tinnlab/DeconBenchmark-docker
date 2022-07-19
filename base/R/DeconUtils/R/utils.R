@@ -1,13 +1,22 @@
-#’ Get arguments from a HDF5 file
-#’
-#’ This function get arguments from a HDF5 file
-#’
-#’ @param params A string vector of parameters.
-#’ @param path path of the HDF5 file.
-#’ @return A list of parameters.
-#’
-#’ @import rhdf5
-#’ @export
+#' @title Get arguments from a HDF5 file
+#'
+#' @description This function read deconvolution input from a HDF5 file.
+#' The h5 file should be created by `DeconBenchmark::.writeArgs`.
+#'
+#' @param params A string vector of parameters.
+#' @return A list of inputs for deconvolution. See details for more information.
+#'
+#' @details
+#' This function will read h5 file from the `INPUT_PATH` environment variable and return the values for the `params`.
+#' When the `PARAMS_OUTPUT_PATH` is available, this function will only write the params to the `PARAMS_OUTPUT_PATH` file and exit R.
+#' This is used to get the parameters of the method wrapper.
+#'
+#' @example
+#'
+#' DeconUtils::getArgs(c("bulk", "nCellTypes")) # list with 2 keys are bulk and nCellTypes
+#'
+#' @import rhdf5
+#' @export
 getArgs <- function(params) {
     if (Sys.getenv("PARAMS_OUTPUT_PATH") != ""){
         paramOutputPath <- Sys.getenv("PARAMS_OUTPUT_PATH")
@@ -52,18 +61,19 @@ getArgs <- function(params) {
     args
 }
 
-#’ Write deconvolution results to a HDF5 file
-#’
-#’ This function write deconvolution results to a HDF5 file
-#’
-#’ @param S Signature matrix.
-#’ @param P Proportion matrix.
-#’ @param method name of the method.
-#’ @param h5file Path of the HDF5 file.
-#’ @return Nothing.
-#’
-#’ @import rhdf5
-#’ @export
+#' @title Write deconvolution results to a HDF5 file
+#'
+#' @description This function write deconvolution results to a HDF5 file.
+#' The path for the h5 file should be set in the `OUTPUT_PATH` environment variable.
+#'
+#' @param S Signature matrix.
+#' @param P Proportion matrix.
+#' @param method name of the method.
+#' @param h5file Path of the HDF5 file.
+#' @return Nothing.
+#'
+#' @import rhdf5
+#' @export
 writeH5 <- function(S, P, method="Unknown") {
     h5file <- Sys.getenv("OUTPUT_PATH")
     if (h5file == ""){
@@ -71,8 +81,21 @@ writeH5 <- function(S, P, method="Unknown") {
     }
     message(method, " Writing results to ", h5file)
 
+    if (is.null(P)){
+        stop("Proportion matrix is null")
+    }
+
     unlink(h5file)
     h5createFile(h5file)
+
+    h5createGroup(h5file,"P")
+    h5write(P, h5file,"P/values")
+    if (!is.null(rownames(P))){
+        h5write(rownames(P), h5file,"P/rownames")
+    }
+    if (!is.null(colnames(P))){
+        h5write(colnames(P), h5file,"P/colnames")
+    }
 
     if (!is.null(S)){
         h5createGroup(h5file,"S")
@@ -82,17 +105,6 @@ writeH5 <- function(S, P, method="Unknown") {
         }
         if (!is.null(colnames(S))){
             h5write(colnames(S), h5file,"S/colnames")
-        }
-    }
-
-    if (!is.null(P)){
-        h5createGroup(h5file,"P")
-        h5write(P, h5file,"P/values")
-        if (!is.null(rownames(P))){
-            h5write(rownames(P), h5file,"P/rownames")
-        }
-        if (!is.null(colnames(P))){
-            h5write(colnames(P), h5file,"P/colnames")
         }
     }
 }
