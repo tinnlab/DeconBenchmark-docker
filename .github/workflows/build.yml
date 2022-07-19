@@ -1,9 +1,6 @@
 name: Build docker images
 
-on:
-  push:
-    branches-ignore:
-      - master
+on: [push]
 
 jobs:
   build:
@@ -66,7 +63,9 @@ jobs:
                 fi
               fi
           
-              # echo "Pushing $METHOD to docker hub"
-              # docker push deconvolution/${METHOD,,}:latest
+              if [[ ${{github.ref}} == "master" ]]; then
+                echo "Pushing $METHOD to docker hub"
+                docker push deconvolution/${METHOD,,}:latest
+              fi
             fi
           done < changes.txt
