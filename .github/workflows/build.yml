@@ -86,7 +86,7 @@ jobs:
                 fi
               fi
           
-              if [[ ${{github.ref}} == "master" && ${{ github.event.inputs.push == "yes" }} ]]; then
+              if [[ ${{github.ref}} == "master" && ${{ github.event.inputs.push }} == "yes" ]]; then
                 echo "Pushing $METHOD to docker hub"
                 docker push deconvolution/${METHOD,,}:latest
               fi
