@@ -10,3 +10,4 @@ suppressMessages(
 P <- unmix(args$bulk, args$cellTypeExpr, alpha = 0.01, quiet = T)
 
 DeconUtils::writeH5(NULL, P, "DESeq2")
+
