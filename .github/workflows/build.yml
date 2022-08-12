@@ -1,6 +1,16 @@
 name: Build docker images
 
-on: [ push ]
+on:
+  workflow_dispatch:
+    inputs:
+      method:
+        description: 'Methods to build (method_names (separated by comma) OR last_commit OR all)'
+        required: true
+        default: 'last_commit'
+      push:
+        description: 'Push to docker hub (yes/no)?'
+        required: true
+        default: 'no'
 
 jobs:
   build:
@@ -12,7 +22,16 @@ jobs:
           fetch-depth: 2
 
       - name: Check file changes
-        run: git diff --name-only HEAD~1 HEAD | grep --perl-regexp '^[^\/]+' --only-matching > changes.txt
+        run: |
+          if [[ ${{ github.event.inputs.method }} == "last_commit" ]]; then
+            git diff --name-only HEAD~1 HEAD | grep --perl-regexp '^[^\/]+' --only-matching > changes.txt
+          else
+            if [[ ${{ github.event.inputs.method }} == "all" ]]; then
+              find . -name Dockerfile | grep --perl-regexp './(.*)/' --only-matching |  grep --perl-regexp '[^/\.]+' --only-matching > changes.txt
+            else
+              echo ${{ github.event.inputs.method }} | grep --perl-regexp '[^,\s]+' --only-matching > changes.txt
+            fi
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -67,7 +86,7 @@ jobs:
                 fi
               fi
           
-              if [[ ${{github.ref}} == "master" ]]; then
+              if [[ ${{github.ref}} == "master" && ${{ github.event.inputs.push == "yes" }} ]]; then
                 echo "Pushing $METHOD to docker hub"
                 docker push deconvolution/${METHOD,,}:latest
               fi
