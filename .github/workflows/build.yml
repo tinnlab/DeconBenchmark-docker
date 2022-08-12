@@ -1,6 +1,16 @@
 name: Build docker images
 
-on: [push]
+on:
+  workflow_dispatch:
+    inputs:
+      method:
+        description: 'Methods to build (method_names (separated by comma) OR last_commit OR all)'
+        required: true
+        default: 'last_commit'
+      push:
+        description: 'Push to docker hub (yes/no)?'
+        required: true
+        default: 'no'
 
 jobs:
   build:
@@ -12,7 +22,16 @@ jobs:
           fetch-depth: 2
 
       - name: Check file changes
-        run: git diff --name-only HEAD~1 HEAD | grep --perl-regexp '^[^\/]+' --only-matching > changes.txt
+        run: |
+          if [[ ${{ github.event.inputs.method }} == "last_commit" ]]; then
+            git diff --name-only HEAD~1 HEAD | grep --perl-regexp '^[^\/]+' --only-matching > changes.txt
+          else
+            if [[ ${{ github.event.inputs.method }} == "all" ]]; then
+              find . -name Dockerfile | grep --perl-regexp './(.*)/' --only-matching |  grep --perl-regexp '[^/\.]+' --only-matching > changes.txt
+            else
+              echo ${{ github.event.inputs.method }} | grep --perl-regexp '[^,\s]+' --only-matching > changes.txt
+            fi
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v1
@@ -33,7 +52,7 @@ jobs:
           do
             if [ -f "$METHOD/Dockerfile" ]; then
               echo "Building $METHOD"
-              
+          
               docker buildx build \
                      --build-arg BASE_IMAGE=deconvolution/base:latest \
                      --tag deconvolution/${METHOD,,}:latest \
@@ -42,28 +61,32 @@ jobs:
                      --output=type=docker $METHOD
           
               if [[ "$METHOD" != "base" ]]; then
-                echo "Testing $METHOD using docker run"
-                docker run --rm -v `pwd`/data/bone-marrow.h5:/input.h5 -v `pwd`:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 deconvolution/${METHOD,,}:latest
+                if [[ -f "$METHOD/.MATLAB" ]]; then
+                  echo "$METHOD uses MATLAB and will not be tested"
+                else
+                  echo "Testing $METHOD using docker run"
+                  docker run --rm -v `pwd`/data/bone-marrow.h5:/input.h5 -v `pwd`:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 deconvolution/${METHOD,,}:latest
             
-                if [ -f "$METHOD-results.h5" ]; then
-                  echo "Found $METHOD-results.h5 for docker run"
-                  
-                  echo "Testing $METHOD using singularity run"
-                  singularity run --env INPUT_PATH=`pwd`/data/bone-marrow.h5 --env OUTPUT_PATH=`pwd`/$METHOD-results.h5 docker-daemon:deconvolution/${METHOD,,}:latest  
-                  
                   if [ -f "$METHOD-results.h5" ]; then
-                    echo "Found $METHOD-results.h5 for singularity run"        
+                    echo "Found $METHOD-results.h5 for docker run"
+            
+                    echo "Testing $METHOD using singularity run"
+                    singularity run --env INPUT_PATH=`pwd`/data/bone-marrow.h5 --env OUTPUT_PATH=`pwd`/$METHOD-results.h5 docker-daemon:deconvolution/${METHOD,,}:latest  
+            
+                    if [ -f "$METHOD-results.h5" ]; then
+                      echo "Found $METHOD-results.h5 for singularity run"        
+                    else
+                      echo "$METHOD-results.h5 does not exist using singularity run."
+                      exit 1
+                    fi
                   else
-                    echo "$METHOD-results.h5 does not exist using singularity run."
+                    echo "$METHOD-results.h5 does not exist using docker run."
                     exit 1
                   fi
-                else
-                  echo "$METHOD-results.h5 does not exist using docker run."
-                  exit 1
                 fi
               fi
           
-              if [[ ${{github.ref}} == "master" ]]; then
+              if [[ ${{github.ref}} == "master" && ${{ github.event.inputs.push == "yes" }} ]]; then
                 echo "Pushing $METHOD to docker hub"
                 docker push deconvolution/${METHOD,,}:latest
               fi
