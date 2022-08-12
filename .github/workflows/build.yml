@@ -42,7 +42,7 @@ jobs:
                      --output=type=docker $METHOD
           
               if [[ "$METHOD" != "base" ]]; then
-                if [[ && -f "$METHOD/.MATLAB" ]]; then
+                if [[ -f "$METHOD/.MATLAB" ]]; then
                   echo "$METHOD uses MATLAB and will not be tested"
                 else
                   echo "Testing $METHOD using docker run"
