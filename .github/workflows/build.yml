@@ -73,7 +73,7 @@ jobs:
                     echo "Found $METHOD-results-docker.h5 for docker run"
             
                     echo "Testing $METHOD using singularity run"
-                    singularity run --env INPUT_PATH=`pwd`/data/bone-marrow.h5 --env OUTPUT_PATH=`pwd`/$METHOD-results-singularity.h5 docker-daemon:deconvolution/${METHOD,,}:latest  
+                    singularity run --cleanenv --env INPUT_PATH=`pwd`/data/bone-marrow.h5 --env OUTPUT_PATH=`pwd`/$METHOD-results-singularity.h5 docker-daemon:deconvolution/${METHOD,,}:latest  
             
                     if [ -f "$METHOD-results-singularity.h5" ]; then
                       echo "Found $METHOD-results-singularity.h5 for singularity run"        
