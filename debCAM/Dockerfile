@@ -9,6 +9,7 @@ RUN apt-get update &&  \
     r-bioc-summarizedexperiment && \
     apt-get clean
 
+RUN R -e 'install.packages("rJava")'
 RUN R -e 'BiocManager::install("debCAM", update=F)'
 
 COPY run.R /code/
