@@ -65,22 +65,22 @@ jobs:
                   echo "$METHOD uses MATLAB and will not be tested"
                 else
                   echo "Testing $METHOD using docker run"
-                  docker run --rm -v `pwd`/data/bone-marrow.h5:/input.h5 -v `pwd`:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results.h5 deconvolution/${METHOD,,}:latest
+                  docker run --rm -v `pwd`/data/bone-marrow.h5:/input.h5 -v `pwd`:/output -e INPUT_PATH=/input.h5 -e OUTPUT_PATH=/output/$METHOD-results-docker.h5 deconvolution/${METHOD,,}:latest
             
-                  if [ -f "$METHOD-results.h5" ]; then
-                    echo "Found $METHOD-results.h5 for docker run"
+                  if [ -f "$METHOD-results-docker.h5" ]; then
+                    echo "Found $METHOD-results-docker.h5 for docker run"
             
                     echo "Testing $METHOD using singularity run"
-                    singularity run --env INPUT_PATH=`pwd`/data/bone-marrow.h5 --env OUTPUT_PATH=`pwd`/$METHOD-results.h5 docker-daemon:deconvolution/${METHOD,,}:latest  
+                    singularity run --env INPUT_PATH=`pwd`/data/bone-marrow.h5 --env OUTPUT_PATH=`pwd`/$METHOD-results-singularity.h5 docker-daemon:deconvolution/${METHOD,,}:latest  
             
-                    if [ -f "$METHOD-results.h5" ]; then
-                      echo "Found $METHOD-results.h5 for singularity run"        
+                    if [ -f "$METHOD-results-singularity.h5" ]; then
+                      echo "Found $METHOD-results-singularity.h5 for singularity run"        
                     else
-                      echo "$METHOD-results.h5 does not exist using singularity run."
+                      echo "$METHOD-results-singularity.h5 does not exist using singularity run."
                       exit 1
                     fi
                   else
-                    echo "$METHOD-results.h5 does not exist using docker run."
+                    echo "$METHOD-results-docker.h5 does not exist using docker run."
                     exit 1
                   fi
                 fi
