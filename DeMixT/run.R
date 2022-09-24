@@ -6,21 +6,29 @@ suppressMessages(
       library(SummarizedExperiment)
     })
 )
-
+setwd('/code/')
 bulk <- args$bulk
 singleCellExpr <- args$singleCellExpr
 
-data.Y <- SummarizedExperiment(assays=list(counts=bulk))
+dataY <- SummarizedExperiment(assays=list(counts=bulk))
 
-N1 <- unique(args$singleCellLabels)[1]
-N2 <- unique(args$singleCellLabels)[2]
+res <- matrix(0, ncol = length(unique(args$singleCellLabels)), nrow = ncol(bulk))
+colnames(res) <- unique(args$singleCellLabels)
+rownames(res) <- colnames(bulk)
 
-data.N1 <- SummarizedExperiment(assays=list(counts=singleCellExpr[, args$singleCellLabels == N1]))
-data.N2 <- NULL
-if (!is.na(N2)) {
-  data.N2 <- SummarizedExperiment(assays=list(counts=singleCellExpr[, args$singleCellLabels == N2]))
+for (cellType in unique(args$singleCellLabels)) {
+  mat <- singleCellExpr[, args$singleCellLabels == cellType]
+  dataN1 <- SummarizedExperiment(assays=list(counts=mat))
+  resGS <- try(DeMixT(data.Y = dataY, data.N1 = dataN1, nthread = 10, niter = 10, nspikein = 0, if.filter = FALSE))
+  if(is(resGS, "try-error")) {
+    res[, cellType] <- 0
+  } else {
+    res[, cellType] <- t(resGS$pi["PiN1",])
+  }
 }
 
-res.GS <- DeMixT_GS(data.Y = data.Y, data.N1 = data.N1, data.N2 =  data.N2)
+for (i in 1:nrow(res)) {
+  res[i,] <- res[i,]/sum(res[i,])
+}
 
-DeconUtils::writeH5(NULL, t(res.GS$pi), "DeMixT")
+DeconUtils::writeH5(NULL, res, "DeMixT")
