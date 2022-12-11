@@ -5,6 +5,6 @@ reference <- list(
     sigGenes = args$sigGenes
 )
 
-P <- EPIC::EPIC(args$bulk, reference)$mRNAProportions
+P <- EPIC::EPIC(args$bulk, reference)$cellFractions
 
 DeconUtils::writeH5(NULL, P, "EPIC")
