@@ -11,28 +11,11 @@ RUN apt-get update && \
     r-cran-reshape \
     r-cran-e1071 \
     r-cran-seurat \
-    r-cran-rocr && \
-    apt-get clean
-
-RUN R -e 'BiocManager::install(c("varhandle", "MAST"))'
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+    r-cran-rocr \
     r-cran-magick \
     r-cran-gmp \
     r-cran-rcppparallel \
-    r-cran-rcppgsl && \
-    apt-get clean
-
-RUN R -e 'install.packages("ClusterR")'
-RUN R -e 'library("ClusterR")'
-RUN R -e 'install.packages("RcppArmadillo")'
-RUN R -e 'library("RcppArmadillo")'
-RUN R -e 'install.packages("Rfast")'
-RUN R -e 'library("Rfast")'
-
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends \
+    r-cran-rcppgsl
     r-cran-r.methodss3 \
     r-cran-sass \
     r-cran-tinytex \
@@ -65,6 +48,10 @@ RUN apt-get update && \
     r-bioc-complexheatmap && \
     apt-get clean
 
+RUN R -e 'BiocManager::install(c("varhandle", "MAST", "ClusterR", "RcppArmadillo", "Rfast"))'
+RUN R -e 'library("ClusterR")'
+RUN R -e 'library("RcppArmadillo")'
+RUN R -e 'library("Rfast")'
 RUN R -e 'devtools::install_github("RubD/Giotto", upgrade = "never")'
 RUN R -e 'Giotto::installGiottoEnvironment()'
 
