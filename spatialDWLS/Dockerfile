@@ -15,7 +15,7 @@ RUN apt-get update && \
     r-cran-magick \
     r-cran-gmp \
     r-cran-rcppparallel \
-    r-cran-rcppgsl
+    r-cran-rcppgsl \
     r-cran-r.methodss3 \
     r-cran-sass \
     r-cran-tinytex \
