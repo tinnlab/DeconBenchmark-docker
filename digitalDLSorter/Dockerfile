@@ -21,7 +21,7 @@ RUN apt-get update && \
 
 RUN R -e 'BiocManager::install("zinbwave", update=F)'
 RUN R -e 'library(zinbwave)'
-RUN R -e 'BiocManager::install("digitalDLSorteR")'
+RUN R -e 'BiocManager::install("digitalDLSorteR", version = "0.3.1")'
 RUN R -e 'library(digitalDLSorteR)'
 RUN R -e 'reticulate::install_miniconda("/r-miniconda")'
 RUN /r-miniconda/bin/conda create --name digitaldlsorter-env python=3.7
