@@ -9,6 +9,13 @@ RUN apt-get update && \
     r-cran-reticulate \
     r-cran-ggpubr \
     r-bioc-genefilter \
+    r-cran-igraph \
+    r-bioc-scran \
+    r-cran-matrixstats \
+    r-cran-matrix \
+    r-bioc-biocneighbors \
+    r-bioc-bluster \
+    r-bioc-scuttle \
     python3-venv && \
     apt-get clean
 
